@@ -15,33 +15,34 @@ fn main() -> anyhow::Result<()> {
     let mut b_values = Vec::new();
 
     let (i_max, j_max) = rgb_img.dimensions();
-    // 0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
-    for pixel in rgb_img.pixels() {
+
+    rgb_img.pixels().for_each(|pixel| {
         r_values.push(pixel[0]);
         g_values.push(pixel[1]);
         b_values.push(pixel[2]);
-    }
+    });
 
-    let r_values_chunked: Vec<_> = r_values.chunks(8).collect();
-    let g_values_chunked: Vec<_> = g_values.chunks(8).collect();
-    let b_values_chunked: Vec<_> = b_values.chunks(8).collect();
+    let r_values_chunked: Vec<_> = r_values.chunks(16).collect();
+    let g_values_chunked: Vec<_> = g_values.chunks(16).collect();
+    let b_values_chunked: Vec<_> = b_values.chunks(16).collect();
 
     let r_values_simd = r_values_chunked.iter().map(|x| {
         let x: Vec<_> = x.iter().map(|x| *x as f32).collect();
-        f32x8::load_or_default(x.as_slice())
+        f32x16::load_or_default(x.as_slice())
     });
     let g_values_simd = g_values_chunked.iter().map(|x| {
         let x: Vec<_> = x.iter().map(|x| *x as f32).collect();
-        f32x8::load_or_default(x.as_slice())
+        f32x16::load_or_default(x.as_slice())
     });
     let b_values_simd = b_values_chunked.iter().map(|x| {
         let x: Vec<_> = x.iter().map(|x| *x as f32).collect();
-        f32x8::load_or_default(x.as_slice())
+        f32x16::load_or_default(x.as_slice())
     });
 
-    let mult_by_r = f32x8::from_slice(&[0.299; 8]);
-    let mult_by_g = f32x8::from_slice(&[0.587; 8]);
-    let mult_by_b = f32x8::from_slice(&[0.114; 8]);
+    // 0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
+    let mult_by_r = f32x16::from_slice(&[0.299; 16]);
+    let mult_by_g = f32x16::from_slice(&[0.587; 16]);
+    let mult_by_b = f32x16::from_slice(&[0.114; 16]);
 
     let r_values_simd_transformed: Vec<_> = r_values_simd.map(|x| x * mult_by_r).collect();
 
@@ -69,7 +70,6 @@ fn main() -> anyhow::Result<()> {
     // Store to path
     let image = GrayImage::from_vec(i_max, j_max, result_vec).unwrap();
     let format = ImageFormat::from_path(args.output_file.clone())?;
-    println!("Format: {:?}", format);
     let mut file = std::fs::File::create(args.output_file).unwrap();
     image.write_to(&mut file, format)?;
     Ok(())

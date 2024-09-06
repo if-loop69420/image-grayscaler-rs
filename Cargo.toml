@@ -7,4 +7,3 @@ edition = "2021"
 anyhow = "1.0.86"
 clap = { version = "4.5.17", features = ["derive"] }
 image = "0.25.2"
-rayon = "1.10.0"
