@@ -1,4 +1,6 @@
 /target
+/images
+
 # JPEG
 *.jpg
 *.jpeg

@@ -417,6 +417,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "image-grayscaler-rs"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "image",
+ "rayon",
+]
+
+[[package]]
 name = "image-webp"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -424,15 +434,6 @@ checksum = "f79afb8cbee2ef20f59ccd477a218c12a93943d075b492015ecb1bb81f8ee904"
 dependencies = [
  "byteorder-lite",
  "quick-error",
-]
-
-[[package]]
-name = "image_grayscaler"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "image",
 ]
 
 [[package]]
